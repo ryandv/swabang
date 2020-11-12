@@ -1,4 +1,103 @@
 #include <avr/io.h>
+#include <stdint.h>
+
+#define ws2812b_color(port,bit,red,green,blue) \
+{ \
+    uint8_t s, x, y, z; \
+    __asm__ __volatile__("ldi %[rx], %[immg]" "\n\t" \
+                         "ldi %[ry], %[immr]" "\n\t" \
+                         "ldi %[rz], %[immb]" "\n\t" \
+                         "ldi %[rs], %[immeight]" "\n\t" \
+               "L_GXH: " "sbi %[A], %[b]" "\n\t" \
+                         "subi %[rs], %[immone]" "\n\t" \
+                         "nop" "\n\t" \
+                         "sbrs %[rx], %[immseven]" "\n\t" \
+                         "rjmp L_G0L" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "rjmp L_G1L" "\n\t" \
+               "L_G0L: " "cbi %[A], %[b]" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "rjmp L_GEND" "\n\t" \
+               "L_G1L: " "cbi %[A], %[b]" "\n\t" \
+              "L_GEND: " "cpi %[rs], %[immzero]" "\n\t" \
+                         "breq L_RSTART" "\n\t" \
+                         "lsl %[rx]" "\n\t" \
+                         "nop" "\n\t" \
+                         "rjmp L_GXH" "\n\t" \
+            "L_RSTART: " "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "ldi %[rs], %[immeight]" "\n\t" \
+               "L_RXH: " "sbi %[A], %[b]" "\n\t" \
+                         "subi %[rs], %[immone]" "\n\t" \
+                         "nop" "\n\t" \
+                         "sbrs %[ry], %[immseven]" "\n\t" \
+                         "rjmp L_R0L" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "rjmp L_R1L" "\n\t" \
+               "L_R0L: " "cbi %[A], %[b]" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "rjmp L_REND" "\n\t" \
+               "L_R1L: " "cbi %[A], %[b]" "\n\t" \
+              "L_REND: " "cpi %[rs], %[immzero]" "\n\t" \
+                         "breq L_BSTART" "\n\t" \
+                         "lsl %[ry]" "\n\t" \
+                         "nop" "\n\t" \
+                         "rjmp L_RXH" "\n\t" \
+            "L_BSTART: " "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "ldi %[rs], %[immeight]" "\n\t" \
+               "L_BXH: " "sbi %[A], %[b]" "\n\t" \
+                         "subi %[rs], %[immone]" "\n\t" \
+                         "nop" "\n\t" \
+                         "sbrs %[rz], %[immseven]" "\n\t" \
+                         "rjmp L_B0L" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "rjmp L_B1L" "\n\t" \
+               "L_B0L: " "cbi %[A], %[b]" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "nop" "\n\t" \
+                         "rjmp L_BEND" "\n\t" \
+               "L_B1L: " "cbi %[A], %[b]" "\n\t" \
+              "L_BEND: " "cpi %[rs], %[immzero]" "\n\t" \
+                         "breq L_EXIT" "\n\t" \
+                         "lsl %[rz]" "\n\t" \
+                         "nop" "\n\t" \
+                         "rjmp L_BXH" "\n\t" \
+              "L_EXIT: " "ret" \
+                         : [rs] "+d" (s), \
+                           [rx] "+d" (x), \
+                           [ry] "+d" (y), \
+                           [rz] "+d" (z) \
+                         : [A] "I" _SFR_IO_ADDR(port), \
+                           [b] "I" (bit), \
+                           [immzero] "I" (0), \
+                           [immone] "I" (1), \
+                           [immseven] "I" (7), \
+                           [immeight] "I" (8), \
+                           [immr] "M" (red), \
+                           [immg] "M" (green), \
+                           [immb] "M" (blue)); \
+}
 
 #define ws2812b_zero(port,bit) \
     __asm__ __volatile__("sbi %[A], %[b]" "\n\t" \
@@ -50,139 +149,6 @@
 
 #define ws2812b_reset(port,bit) \
     __asm__ __volatile__("cbi %[A], %[b]" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
-                         "nop" "\n\t" \
                          "nop" "\n\t" \
                          "nop" "\n\t" \
                          "nop" "\n\t" \
