@@ -33,33 +33,7 @@ $ echo '#include "swabang.h"
 >         while (1) {
 >                 DDRB |= _BV(DDB0);
 >                 ws2812b_reset(PORTB, PORTB0);
-> 
->                 ws2812b_one(PORTB, PORTB0);
->                 ws2812b_one(PORTB, PORTB0);
->                 ws2812b_one(PORTB, PORTB0);
->                 ws2812b_one(PORTB, PORTB0);
->                 ws2812b_one(PORTB, PORTB0);
->                 ws2812b_one(PORTB, PORTB0);
->                 ws2812b_one(PORTB, PORTB0);
->                 ws2812b_one(PORTB, PORTB0);
-> 
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
-> 
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
->                 ws2812b_zero(PORTB, PORTB0);
+>                 ws2812b_color(PORTB, PORTB0, 0, 255, 0);
 >         }
 > }' > main.c
 ```
