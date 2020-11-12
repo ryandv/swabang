@@ -7,9 +7,6 @@
 
 ; ws2812b_color(red, green, blue)
 ;
-; preprocessor constants:
-; PORT : uint8_t
-;
 ; arguments:
 ; r24 <- red  ;  r22 <- green  ;  r20 <- blue
 ;

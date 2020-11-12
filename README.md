@@ -4,7 +4,7 @@ A minimal starter kit for programming WS2812b LEDs with AVR Libc on the Arduino 
 
 Includes:
 
-* Inline AVR assembly macros for the WS2812b data protocol
+* Assembly procedures for bit-banging the WS2812b data protocol
 * Makefile for building and flashing the Arduino Uno ROM
 
 ## Prerequisites
@@ -16,30 +16,41 @@ You will require the following:
 * avr-objcopy
 * avrdude
 
-You may need to add yourself to the `uucp` group to read/write from serial ports:
+You may need to add yourself to the `uucp` group to read/write from/to serial ports:
 
 ```sh
-usermod -a -G uucp yourself
+$ usermod -a -G uucp yourself
 ```
 
 ## Usage
 
-Include the `swabang.h` header & write an entry point:
+Assemble procedures for the WS2812b data protocol:
 
 ```sh
-$ echo '#include "swabang.h"
+$ make clean; make
+$ file swabang.o
+swabang.o: ELF 32-bit LSB relocatable, Atmel AVR 8-bit, version 1 (SYSV), not stripped
+```
+
+Write an entry point defining `main`:
+
+```sh
+$ echo '#include <avr/io.h>
 > int main()
 > {
+>         DDRB |= _BV(DDB0);
+>
 >         while (1) {
->                 DDRB |= _BV(DDB0);
 >                 ws2812b_reset(PORTB, PORTB0);
->                 ws2812b_color(PORTB, PORTB0, 0, 255, 0);
+>                 ws2812b_color(255, 0, 255);
 >         }
 > }' > main.c
 ```
 
-Build the application and upload it to the Arduino. Here we assume the device file `/dev/ttyACM0` is connected to the Arduino's serial port:
+Forward declarations for the ws2812b procedures will automatically be included into your program. See [swabang.h](./swabang.h) for a list of available procedures.
+
+Build the application and flash it onto the Arduino. Here we assume the device file `/dev/ttyACM0` has been adequately permissioned and is connected to the Arduino's serial port:
 
 ```sh
-make MAIN_FILE=main.c AVRDUDE_PORT=/dev/ttyACM0
+make flash MAIN_FILE=main.c AVRDUDE_PORT=/dev/ttyACM0
 ```
