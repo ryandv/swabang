@@ -33,4 +33,4 @@ ifndef MAIN_FILE
 endif
 
 clean:
-	rm -f $(hexdump) $(binary) $(objects)
+	rm -f $(hexdump) $(binary)
