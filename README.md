@@ -13,7 +13,7 @@ You will require the following:
 
 * avr-libc
 * avr-gcc
-* avr-objdump
+* avr-objcopy
 * avrdude
 
 You may need to add yourself to the `uucp` group to read/write from serial ports:
