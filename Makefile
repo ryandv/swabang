@@ -9,19 +9,15 @@ AVRDUDE=avrdude
 AVRDUDE_BAUD=115200
 AVRDUDE_FLAGS=-c arduino -p ATMEGA328P -b $(AVRDUDE_BAUD)
 
-objects=swabang.o
 binary=a.out
 hexdump=a.hex
 
-all: $(objects)
+all: flash
 
-$(objects): %.o: %.S
-	$(CC) $(CFLAGS) -c $< -o $@
+$(hexdump): check-main-defined
+	$(CC) $(CFLAGS) $(MAIN_FILE) -o $(binary) && $(OBJCOPY) $(OBJCOPY_FLAGS) $(binary) $(hexdump)
 
-$(hexdump): $(objects) check-main-defined
-	$(CC) $(CFLAGS) $(objects) $(MAIN_FILE) -o $(binary) && $(OBJCOPY) $(OBJCOPY_FLAGS) $(binary) $(hexdump)
-
-upload: $(hexdump) check-avrdude-port-defined
+flash: $(hexdump) check-avrdude-port-defined
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -P $(AVRDUDE_PORT) -U flash:w:$(hexdump)
 
 .PHONY: check-avrdude-port-defined check-main-defined clean
