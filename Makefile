@@ -17,25 +17,31 @@ hexdump=a.hex
 all: $(objects)
 
 $(objects): %.o: %.S
-	$(CC) $(CFLAGS) -c $< -o $@
+ifndef SWABANG_BIT
+		$(error SWABANG_BIT is undefined)
+endif
+ifndef SWABANG_PORT
+		$(error SWABANG_PORT is undefined)
+endif
+	$(CC) $(CFLAGS) -DSWABANG_PORT=$(SWABANG_PORT) -DSWABANG_BIT=$(SWABANG_BIT) -c $< -o $@
 
-$(hexdump): $(objects) check-main-defined
+$(hexdump): $(objects)
+ifndef MAIN_FILE
+		$(error MAIN_FILE is undefined)
+endif
 	$(CC) $(CFLAGS) -include $(headers) $(objects) $(MAIN_FILE) -o $(binary) && $(OBJCOPY) $(OBJCOPY_FLAGS) $(binary) $(hexdump)
 
-flash: $(hexdump) check-avrdude-port-defined
+flash: $(hexdump)
+ifndef AVRDUDE_PORT
+		$(error AVRDUDE_PORT is undefined)
+endif
 	$(AVRDUDE) $(AVRDUDE_FLAGS) -P $(AVRDUDE_PORT) -U flash:w:$(hexdump)
 
 .PHONY: check-avrdude-port-defined check-main-defined clean
 
 check-avrdude-port-defined:
-ifndef AVRDUDE_PORT
-		$(error AVRDUDE_PORT is undefined)
-endif
 
 check-main-defined:
-ifndef MAIN_FILE
-		$(error MAIN_FILE is undefined)
-endif
 
 clean:
 	rm -f $(hexdump) $(binary) $(objects)

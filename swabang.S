@@ -1,7 +1,7 @@
 #include <avr/io.h>
 
-#define _PORT _SFR_IO_ADDR(PORTB)
-#define _BIT  PORTB0
+#define _PORT _SFR_IO_ADDR(SWABANG_PORT)
+#define _BIT  SWABANG_BIT
 
 .section .text
 

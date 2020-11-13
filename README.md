@@ -1,6 +1,6 @@
 # swabang
 
-A minimal starter kit for programming WS2812b LEDs with AVR Libc on the Arduino Uno/ATmega328P microcontroller.
+A minimal starter kit for programming WS2812b LEDs with avr-libc on the Arduino Uno/ATmega328P microcontroller.
 
 Includes:
 
@@ -24,10 +24,12 @@ $ usermod -a -G uucp yourself
 
 ## Usage
 
+Choose an I/O port and bit number from <avr/iom328p.h>. This example assumes bit 0 of port B is chosen (pin 8 on the Uno R3).
+
 Assemble procedures for the WS2812b data protocol:
 
 ```sh
-$ make clean; make
+$ make clean; make SWABANG_BIT=PORTB0 SWABANG_PORT=PORTB
 $ file swabang.o
 swabang.o: ELF 32-bit LSB relocatable, Atmel AVR 8-bit, version 1 (SYSV), not stripped
 ```
