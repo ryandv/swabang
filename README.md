@@ -38,14 +38,16 @@ Write an entry point defining `main`:
 
 ```sh
 $ echo '#include <avr/io.h>
+> #include <stdint.h>
+>
 > int main()
 > {
->         DDRB |= _BV(DDB0);
+>     DDRB |= _BV(DDB0);
 >
->         while (1) {
->                 ws2812b_reset(PORTB, PORTB0);
->                 ws2812b_color(255, 0, 255);
->         }
+>     uint8_t buf[12] = { 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1 };
+>
+>     ws2812b_reset();
+>     ws2812b_send(buf,12);
 > }' > main.c
 ```
 
