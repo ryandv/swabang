@@ -25,46 +25,65 @@ ws2812b_send:
                            ; T0H      / T1H
                            ; ------------------------------
     L_XH:  sbi _PORT, _BIT ; 2 cycles
-           subi r18, 1     ; 3 cycle
+           subi r18, 1     ; 3 cycles
            sbrs r20, 7     ; 4 cycles / 5 cycles
            rjmp L_0L       ; 6 cycles /
-           nop             ;          / 6 cycles
-           nop             ;          / 7 cycles
-           nop             ;          / 8 cycles
+           cpi r18, 0      ;          / 6 cycles
+
+           brne L_1LMID    ;          / 7 cycles   / 8 cycles
+           ld r20, X+      ;                       / 10 cycles
+           ldi r18, 8      ;                       / 11 cycles
+           cpi r22, 0      ;                       / 12 cycles
+           nop             ;                       / 13 cycles
+
+                           ; T1L r18=0
+                           ; ------------------------------
+           cbi _PORT, _BIT ; 2 cycles
+           breq L_RET      ; 3 cycles / 4 cycles
+           subi r22, 1     ; 4 cycles
+           nop             ; 5 cycles
+           rjmp L_XH       ; 7 cycles
+
+  L_1LMID: nop             ;          / 8 cycles
            nop             ;          / 9 cycles
            nop             ;          / 10 cycles
-           cpi r18, 0      ;          / 11 cycles
+           nop             ;          / 11 cycles
            nop             ;          / 12 cycles
            nop             ;          / 13 cycles
                            ; ------------------------------
 
-                           ; T1L r18=7..1 / T1L r18=0
+                           ; T1L r18=7..1
                            ; ------------------------------
     L_1L:  cbi _PORT, _BIT ; 2 cycles
-           breq L_1LRET    ; 3 cycles     / 4 cycles
-           lsl r20         ; 4 cycles
+           lsl r20         ; 3 cycles
+           nop             ; 4 cycles
            nop             ; 5 cycles
            rjmp L_XH       ; 7 cycles
 
                            ; T0L r18=7..1 / T0L r18=0
                            ; ------------------------------
     L_0L:  cbi _PORT, _BIT ; 2 cycles
-           nop             ; 3 cycles
-           nop             ; 4 cycles
-           nop             ; 5 cycles
+           cpi r18, 0      ; 3 cycles
+
+           brne L_0LMID    ; 4 cycles     / 5 cycles
+           ld r20, X+      ;              / 7 cycles
+           cpi r22, 0      ;              / 8 cycles
+           breq L_RET      ;              / 9 cycles / 10..14 cycles
+           ldi r18, 8      ;              / 10 cycles
+           nop             ;              / 11 cycles
+           nop             ;              / 12 cycles
+           rjmp L_XH       ;              / 14 cycles
+
+  L_0LMID: lsl r20         ; 5 cycles
            nop             ; 6 cycles
            nop             ; 7 cycles
-           cpi r18, 0      ; 8 cycles
-           breq L_RET      ; 9 cycles     / 10..14 cycles
-           lsl r20         ; 10 cycles
+           nop             ; 8 cycles
+           nop             ; 9 cycles
+           nop             ; 10 cycles
            nop             ; 11 cycles
            nop             ; 12 cycles
            rjmp L_XH       ; 14 cycles
-
-  L_1LRET: nop
-           nop
-           nop
-    L_RET: ret
+    L_RET: ret             ;
 
 ; ws2812b_color(red, green, blue)
 ;
