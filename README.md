@@ -43,7 +43,7 @@ $ echo '#include <avr/io.h>
 >         DDRB |= _BV(DDB0);
 >
 >         while (1) {
->                 ws2812b_reset(PORTB, PORTB0);
+>                 ws2812b_reset();
 >                 ws2812b_color(255, 0, 255);
 >         }
 > }' > main.c
