@@ -43,9 +43,7 @@ $ echo '#include <avr/io.h>
 > int main()
 > {
 >     DDRB |= _BV(DDB0);
->
 >     uint8_t buf[12] = { 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1 };
->
 >     ws2812b_reset();
 >     ws2812b_send(buf,12);
 > }' > main.c
